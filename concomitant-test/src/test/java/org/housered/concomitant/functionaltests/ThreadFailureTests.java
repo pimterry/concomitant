@@ -9,13 +9,18 @@ import static org.junit.Assert.assertSame;
 import java.lang.Thread.State;
 
 import org.housered.concomitant.Concomitant;
+import org.housered.concomitant.ConcomitantRunner;
 import org.housered.concomitant.TestThread;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.Result;
+import org.junit.runner.RunWith;
 import org.junit.runners.model.InitializationError;
 
 public class ThreadFailureTests {
 
+    @Ignore // This is run and examined by the below tests, not standalone.
+    @RunWith(ConcomitantRunner.class)
     public static class TestClassWithFailingThread {
         
         private static Throwable expectedException = new IllegalStateException();

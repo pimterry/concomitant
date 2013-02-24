@@ -5,11 +5,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.housered.concomitant.ConcomitantRunner;
 import org.housered.concomitant.TestThread;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 public class ThreadManagementTests {
     
+    @Ignore
     @RunWith(ConcomitantRunner.class)
     public static class TestClassWithImplicitlyStartedThread {
         
@@ -35,6 +37,7 @@ public class ThreadManagementTests {
         assertTrue(TestClassWithImplicitlyStartedThread.threadWasRun);
     }
     
+    @Ignore
     @RunWith(ConcomitantRunner.class)
     public static class TestClassWithImplicitStartedThreadThatNeedsTime {
         

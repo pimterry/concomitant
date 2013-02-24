@@ -53,13 +53,14 @@ public class ThreadSelectorTest {
     }
     
     @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })    
     public void shouldReturnThreadMonitorForGivenThreads() {
         ThreadMonitor monitor = selector.forThreads(thread1, thread2);
         
         List<TestThread> threads = monitor.getMonitoredThreads();
         
         assertEquals(2, threads.size());
-        assertThat(threads, not(hasItem(nullValue(TestThread.class))));
+        assertThat(threads, (Matcher) not(hasItem(nullValue(TestThread.class))));
     }
 
 }
