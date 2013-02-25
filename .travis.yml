@@ -1,2 +1,5 @@
 language: java
 script: "cd concomitant-parent && mvn verify"
+notifications:
+  email:
+   - pimterry+travis@gmail.com
