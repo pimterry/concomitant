@@ -26,7 +26,7 @@ public class ThreadStateMatcher extends TypeSafeMatcher<TestThread> {
     @Override
     protected void describeMismatchSafely(TestThread item, Description mismatchDescription) {
         mismatchDescription.appendText("was a thread in state " + actualState);
-        mismatchDescription.appendValueList("with stacktrace", "\n", "", item.getThread().getStackTrace());
+        mismatchDescription.appendValueList(" with stacktrace:\n", "\n", "", item.getThread().getStackTrace());
     }
 
 }

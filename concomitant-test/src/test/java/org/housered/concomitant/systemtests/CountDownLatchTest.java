@@ -1,9 +1,13 @@
 package org.housered.concomitant.systemtests;
 
-import static java.lang.Thread.State.BLOCKED;
 import static java.lang.Thread.State.TERMINATED;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.housered.concomitant.Concomitant.*;
+import static org.housered.concomitant.Concomitant.announce;
+import static org.housered.concomitant.Concomitant.assertAllOtherThreadsAre;
+import static org.housered.concomitant.Concomitant.assertThisThreadIs;
+import static org.housered.concomitant.Concomitant.assertThreadsAre;
+import static org.housered.concomitant.Concomitant.blockedOrWaiting;
+import static org.housered.concomitant.Concomitant.event;
 import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.CountDownLatch;
@@ -12,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.housered.concomitant.Concomitant;
 import org.housered.concomitant.ConcomitantRunner;
 import org.housered.concomitant.TestThread;
-import org.housered.concomitant.announcements.Event;
+import org.housered.concomitant.conditions.Event;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,19 +31,19 @@ public class CountDownLatchTest {
         
         final TestThread thread1 = new TestThread() {
             public void run() throws Throwable {
-                assertThisThreadIs(BLOCKED).until(LATCH_FINISHED).on(latch).await();
+                assertThisThreadIs(Thread.State.WAITING).until(LATCH_FINISHED).on(latch).await();
                 assertEquals(0, latch.getCount());
             }
         };
         
         final TestThread thread2 = new TestThread() {
             public void run() throws Throwable {
-                assertAllOtherThreadsAre(Thread.State.WAITING).within(500, TimeUnit.MILLISECONDS);
+                assertAllOtherThreadsAre(Thread.State.WAITING).within(500, TimeUnit.MILLISECONDS).now();
                 assertEquals(2, latch.getCount());
                 
                 latch.countDown();
                 assertEquals(1, latch.getCount());
-                assertAllOtherThreadsAre(blockedOrWaiting());
+                assertAllOtherThreadsAre(blockedOrWaiting()).now();
                 
                 announce(LATCH_FINISHED).on(latch).countDown();
                 assertEquals(0, latch.getCount());
@@ -47,7 +51,7 @@ public class CountDownLatchTest {
         };
         
         Concomitant.startTestThreads(thread1, thread2);
-        assertThreadsAre(TERMINATED).forThreads(thread1, thread2).within(100, MILLISECONDS);
+        assertThreadsAre(TERMINATED).forThreads(thread1, thread2).within(1000, MILLISECONDS).now();
     }
     
 }

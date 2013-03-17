@@ -6,14 +6,8 @@ public abstract class TestThread {
     private volatile Thread thread;
     private volatile Throwable thrown;
     
-    private static TestThreadListener testThreadListener;    
-    
-    public static void setTestThreadListener(TestThreadListener listener) {
-        testThreadListener = listener;
-    }
-    
     public TestThread() {
-        testThreadListener.announceCreation(this);
+        TestContext.context().testThreads().add(this);
     }
     
     public abstract void run() throws Throwable;

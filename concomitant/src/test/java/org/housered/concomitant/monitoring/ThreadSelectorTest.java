@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.hamcrest.Matcher;
 import org.housered.concomitant.TestThread;
-import org.housered.concomitant.TestThreadListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +20,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ThreadSelectorTest {
 
-    @Mock TestThreadListener threadListener;
     @Mock TestThread testThread1;
     @Mock TestThread testThread2;
     @Mock Thread thread1;
@@ -33,8 +31,6 @@ public class ThreadSelectorTest {
     
     @Before
     public void setup() {
-        TestThread.setTestThreadListener(threadListener);
-        
         when(testThread1.getThread()).thenReturn(thread1);
         when(testThread2.getThread()).thenReturn(thread2);
         

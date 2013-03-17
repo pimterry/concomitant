@@ -1,27 +1,26 @@
 package org.housered.concomitant.rules;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.housered.concomitant.TestThread;
+import org.housered.concomitant.TestContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class ConcomitantTestRule implements TestRule {
     
-    List<TestThread> testThreads = new ArrayList<TestThread>();
+    private TestContext testContext;
+
+    public ConcomitantTestRule(TestContext context) {
+        this.testContext = context;
+    }
 
     @Override
     public Statement apply(Statement statement, Description description) {
-        statement = new AlwaysRunTestThreads().apply(statement, description);
-        statement = new EnsureTestThreadsTerminate().apply(statement, description);
-        statement = new EnsureTestThreadsAllSucceed().apply(statement, description);
-        statement = new TestThreadMonitorRule().apply(statement, description);
+        statement = new AlwaysRunTestThreads(testContext).apply(statement, description);
+        statement = new EnsureTestThreadsTerminate(testContext).apply(statement, description);
+        statement = new EnsureTestThreadsAllSucceed(testContext).apply(statement, description);
+        statement = new ResetTestContextRule(testContext).apply(statement, description);
         
         return statement;
     }
-
-    
     
 }

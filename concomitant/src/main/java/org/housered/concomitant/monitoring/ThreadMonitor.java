@@ -2,73 +2,104 @@ package org.housered.concomitant.monitoring;
 
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
+import org.housered.concomitant.ConcomitantMisuseError;
 import org.housered.concomitant.TestThread;
-import org.housered.concomitant.announcements.Event;
-import org.housered.concomitant.announcements.Tick;
+import org.housered.concomitant.conditions.Condition;
+import org.housered.concomitant.conditions.WaitCondition;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class ThreadMonitor {
 
-    private Matcher<TestThread> matcher;
-    private List<TestThread> threads;
+    private final Matcher<TestThread> matcher;
+    private final List<TestThread> threads;
+    
+    private Condition untilCondition;
+    private WaitCondition withinCondition = new WaitCondition(100);
 
     public ThreadMonitor(Matcher<TestThread> matcher, TestThread... threads) {
         this.matcher = matcher;
         this.threads = Arrays.asList(threads);
     }
 
-    public ThreadMonitor until(Tick tick) {
+    public ThreadMonitor until(Condition condition) {
+        if (condition != null) {
+            throw new ConcomitantMisuseError(
+                    "You can't set multiple temporal conditions for a thread assertion "
+                            + "(i.e. assert...until(x).until(y)) is not allowed");
+        }
+
+        this.untilCondition = condition;
         return this;
     }
 
-    public ThreadMonitor until(Event latchFinished) {
-        return this;
-    }
-
-    /**
-     * Spins, checking for the given condition once per millisecond until it's true,
-     * or the given period passes. 
-     * 
-     * It's not possible to get definitively notified on state changes, so very brief 
-     * states matching the given thread condition could be missed if they last less than
-     * one millisecond.
-     */
-    public void within(int duration, TimeUnit timeUnit) throws InterruptedException {
+    public ThreadMonitor within(int duration, TimeUnit timeUnit) throws InterruptedException {
         long millisDuration = TimeUnit.MILLISECONDS.convert(duration, timeUnit);
-        
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime <= millisDuration) {
-            if (everyItem(matcher).matches(threads)) {
-                return;
+        withinCondition = new WaitCondition(millisDuration);
+        return this;
+    }
+    
+    public void now() throws InterruptedException {
+        assertConditionFulfilledOnTime();
+        assertConditionRemainsFulfilledLongEnough();
+    }
+    
+    private void assertConditionFulfilledOnTime() throws InterruptedException {
+        if (withinCondition != null) {
+            withinCondition.start();
+            while (!withinCondition.satisfied()) {
+                if (everyItem(matcher).matches(threads)) {
+                    return;
+                }
+                Thread.sleep(1);
             }
+        }
+        
+        assertThat(threads, everyItem(matcher));
+    }
+
+    private void assertConditionRemainsFulfilledLongEnough() throws InterruptedException {
+        assertThat(threads, everyItem(matcher));
+        
+        if (untilCondition == null) return;
+        
+        while (!untilCondition.satisfied()) {
+            assertThat(threads, everyItem(matcher));
             Thread.sleep(1);
         }
-        assertThat(threads, everyItem(matcher));
     }
 
     /**
      * This should be called with the object on which the blocking call will be made, and should
      * be immediately followed with the actual blocking call.
-     * 
      */
-    public <T> T on(T thingToCall) {
-        // Return a spy on the real object, which mocks everything to doAnswer with an answer that
-        // starts a monitoring thread, calls the real method, and watches for it to return.
-        
-        // Monitoring thread watches for the liveness conditions, and ensures the real thread
-        // is awake by that point
-        
-        // End of answer watches for the method to return, in case it doesn't block at all, and
-        // confirms that the monitoring thread is happy everything has finished.
-        
-        // For now, probably just use Mockito directly, eventually maybe do the spying ourself, to remove
-        // the dependency?
-        return thingToCall;
+    @SuppressWarnings("unchecked")
+    public <T> T on(T thingToCall) {        
+        return (T) mock((Class<?>)thingToCall.getClass(), withSettings().defaultAnswer(new Answer<Object>() {
+            public Object answer(final InvocationOnMock invocation) throws Throwable {
+                Future<Void> assertFuture = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+                    public Void call() throws Exception {
+                        ThreadMonitor.this.now();
+                        return null;
+                    }
+                });
+                
+                Object result = invocation.callRealMethod();
+                assertFuture.get(); // TODO What if the assertFuture is monitoring this thread?
+                return result;
+            }
+        }).spiedInstance(thingToCall));
     }
 
     protected List<TestThread> getMonitoredThreads() {

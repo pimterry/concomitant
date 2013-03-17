@@ -4,6 +4,7 @@ import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.housered.concomitant.TestContext;
 import org.housered.concomitant.TestThread;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -14,6 +15,12 @@ import org.junit.runners.model.Statement;
  */
 public class EnsureTestThreadsTerminate implements TestRule {
     
+    private TestContext testContext;
+
+    public EnsureTestThreadsTerminate(TestContext testContext) {
+        this.testContext = testContext;
+    }
+
     @Override
     public Statement apply(final Statement base, Description description) {
         return new RunTestInOtherThreadAndMonitorDeadlockStatement(base);
@@ -24,7 +31,7 @@ public class EnsureTestThreadsTerminate implements TestRule {
         return (threadState == State.BLOCKED || threadState == State.WAITING);
     }
     
-    private static class RunTestInOtherThreadAndMonitorDeadlockStatement extends Statement {
+    private class RunTestInOtherThreadAndMonitorDeadlockStatement extends Statement {
 
         private static final long DEADLOCK_POLLING_INTERVAL = 50;
         
@@ -47,7 +54,7 @@ public class EnsureTestThreadsTerminate implements TestRule {
             }
             
             if (!areAllThreadsTerminated()) {
-                for (TestThread testThread : TestThreadMonitorRule.getTestThreads()) {
+                for (TestThread testThread : testContext.testThreads()) {
                     if (testThread.threwException()) {
                         throw new IllegalStateException("Deadlock! Probably caused by exception thrown from test thread: ", testThread.getThrown());
                     }
@@ -77,7 +84,7 @@ public class EnsureTestThreadsTerminate implements TestRule {
                 threads.add(actualThread);
             }
             
-            for (TestThread testThread : TestThreadMonitorRule.getTestThreads()) {
+            for (TestThread testThread : testContext.testThreads()) {
                 Thread realThread = testThread.getThread();
                 
                 // Real thread will be null when the TestThread has been created

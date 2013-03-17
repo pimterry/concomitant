@@ -9,7 +9,7 @@ import org.junit.runners.model.InitializationError;
 
 public class ConcomitantRunner extends BlockJUnit4ClassRunner {
 
-    private ConcomitantTestRule testRule = new ConcomitantTestRule();
+    private ConcomitantTestRule testRule = new ConcomitantTestRule(TestContext.context());
     
     public ConcomitantRunner(Class<?> klass) throws InitializationError {
         super(klass);

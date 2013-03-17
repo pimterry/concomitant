@@ -11,7 +11,7 @@ import static org.junit.Assert.fail;
 import org.housered.concomitant.Concomitant;
 import org.housered.concomitant.ConcomitantRunner;
 import org.housered.concomitant.TestThread;
-import org.housered.concomitant.announcements.Event;
+import org.housered.concomitant.conditions.Event;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

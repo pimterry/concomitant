@@ -1,11 +1,18 @@
 package org.housered.concomitant.rules;
 
+import org.housered.concomitant.TestContext;
 import org.housered.concomitant.TestThread;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class EnsureTestThreadsAllSucceed implements TestRule {
+
+    private TestContext testContext;
+
+    public EnsureTestThreadsAllSucceed(TestContext testContext) {
+        this.testContext = testContext;
+    }
 
     @Override
     public Statement apply(Statement base, Description description) {
@@ -29,7 +36,7 @@ public class EnsureTestThreadsAllSucceed implements TestRule {
     }
 
     public void rethrowExceptionsFromTestThreads() throws Throwable {
-        for (TestThread thread : TestThreadMonitorRule.getTestThreads()) {
+        for (TestThread thread : testContext.testThreads()) {
             if (thread.threwException()) {
                 throw thread.getThrown();
             }
