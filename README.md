@@ -5,7 +5,7 @@ Concomitant is a framework and set of utilities for conveniently testing concurr
 
 Current Status [![Build Status](https://travis-ci.org/pimterry/concomitant.png)](https://travis-ci.org/pimterry/concomitant)
 --------------
-Concomitant is currently in very very early pre-release development, aiming for a first semi-usable 0.1 release by mid-March.
+Concomitant is currently in very very early pre-release development, aiming for a first semi-usable 0.1 release by mid-April.
 
 Inspirations
 ------------
