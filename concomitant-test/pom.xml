@@ -3,7 +3,7 @@
 >
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.housered.concomitant</groupId>
+        <groupId>org.concomitant</groupId>
         <artifactId>concomitant-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../concomitant-parent</relativePath>

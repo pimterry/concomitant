@@ -12,7 +12,7 @@ We're actively aiming for a first v0.1.0 release at the moment, providing proof 
 * Simply unit testing code with potential race conditions to deterministically verify thread safety
 * Enabling integration testing of fundamentally concurrent systems deterministically
 
-The specific steps to enable this are visible under the [v0.1.0 milestone](https://github.com/pimterry/concomitant/issues?milestone=1&state=open). Take a look at the [system test suite](https://github.com/pimterry/concomitant/tree/master/concomitant-test/src/test/java/org/housered/concomitant/systemtests) for examples of how this works so far.
+The specific steps to enable this are visible under the [v0.1.0 milestone](https://github.com/pimterry/concomitant/issues?milestone=1&state=open). Take a look at the [system test suite](https://github.com/pimterry/concomitant/tree/master/concomitant-test/src/test/java/org/concomitant/systemtests) for examples of how this works so far.
 
 Inspirations
 ------------
