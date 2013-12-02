@@ -53,22 +53,30 @@ public class EnsureTestThreadsTerminate implements TestRule {
                 joinRunningThreads(DEADLOCK_POLLING_INTERVAL);
             }
             
+            checkAllThreadsAreTerminated();
+
+            if (thrown != null) {
+                throw thrown;
+            }
+        }
+
+        private void checkAllThreadsAreTerminated() throws Throwable {
             if (!areAllThreadsTerminated()) {
                 for (TestThread testThread : testContext.testThreads()) {
                     if (testThread.threwException()) {
                         throw new IllegalStateException("Deadlock! Probably caused by exception thrown from test thread: ", testThread.getThrown());
                     }
                 }
-                
+
                 for (Thread thread : getLiveThreads()) {
                     printThreadStackTrace(thread);
                 }
                 throw new IllegalStateException("Deadlock!");
             }
-            
-            if (thrown != null) {
-                throw thrown;
-            }
+        }
+
+        private boolean areAllThreadsTerminated() {
+            return getLiveThreads().isEmpty();
         }
         
         private void printThreadStackTrace(Thread thread) {
@@ -88,7 +96,7 @@ public class EnsureTestThreadsTerminate implements TestRule {
                 Thread realThread = testThread.getThread();
                 
                 // Real thread will be null when the TestThread has been created
-                // but nothing's yet tried to start it.
+                // but nothing has yet tried to start it.
                 if (realThread != null && realThread.isAlive()) {
                     threads.add(realThread);
                 }
@@ -112,11 +120,8 @@ public class EnsureTestThreadsTerminate implements TestRule {
                 threads.get(0).join(timeout);
             }
         }
-        
-        private boolean areAllThreadsTerminated() {
-            return getLiveThreads().isEmpty();
-        }
 
+        // TODO: Refactor this into just another TestThread + runner, so we can catch exceptions via EnsureTestThreadsAllSucceed instead
         private class ActualTestRunnable implements Runnable {
 
             private Statement base;

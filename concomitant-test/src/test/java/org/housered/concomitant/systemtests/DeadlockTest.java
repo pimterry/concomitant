@@ -16,6 +16,16 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * This test deterministically sets up a deadlock, and passes the test by asserting on the deadlock's
+ * existence
+ *
+ * The deadlock is the classic example, with two resources taken in opposite orders by two threads.
+ * This is made deterministic by having each thread wait using the event API to ensure they only
+ * grab their second resource once it's definitely already locked.
+ *
+ * The test then asserts that the threads are both locked as expected, kills the threads, and ends the test
+ */
 @RunWith(ConcomitantRunner.class)
 public class DeadlockTest {
 

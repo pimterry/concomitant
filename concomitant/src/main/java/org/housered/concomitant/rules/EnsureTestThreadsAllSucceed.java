@@ -15,24 +15,13 @@ public class EnsureTestThreadsAllSucceed implements TestRule {
     }
 
     @Override
-    public Statement apply(Statement base, Description description) {
-        return new TestThreadsMustSuccessStatement(base);
-    }
-    
-    private class TestThreadsMustSuccessStatement extends Statement {
-
-        private Statement base;
-
-        public TestThreadsMustSuccessStatement(Statement base) {
-            this.base = base;
-        }
-
-        @Override
-        public void evaluate() throws Throwable {
-            base.evaluate();
-            rethrowExceptionsFromTestThreads();
-        }
-        
+    public Statement apply(final Statement base, Description description) {
+        return new Statement() {
+            public void evaluate() throws Throwable {
+                base.evaluate();
+                rethrowExceptionsFromTestThreads();
+            }
+        };
     }
 
     public void rethrowExceptionsFromTestThreads() throws Throwable {

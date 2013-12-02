@@ -20,18 +20,22 @@ import org.housered.concomitant.conditions.Event;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * This is an example set of tests, checking the core concurrent functionality
+ * of Java's built-in CountDownLatch component.
+ */
 @RunWith(ConcomitantRunner.class)
 public class CountDownLatchTest {
     
-    protected static final Event LATCH_FINISHED = event("latch down");
+    protected static final Event LATCH_DOWN_TO_0 = event("latch down");
     
     @Test
-    public void testBasicCountDown() throws Exception {
+    public void latchAwaitShouldBlockUntilLatchIsAt0() throws Exception {
         final CountDownLatch latch = new CountDownLatch(2);
         
         final TestThread thread1 = new TestThread() {
             public void run() throws Throwable {
-                assertThisThreadIs(Thread.State.WAITING).until(LATCH_FINISHED).on(latch).await();
+                assertThisThreadIs(Thread.State.WAITING).until(LATCH_DOWN_TO_0).on(latch).await();
                 assertEquals(0, latch.getCount());
             }
         };
@@ -45,7 +49,7 @@ public class CountDownLatchTest {
                 assertEquals(1, latch.getCount());
                 assertAllOtherThreadsAre(blockedOrWaiting()).now();
                 
-                announce(LATCH_FINISHED).on(latch).countDown();
+                announce(LATCH_DOWN_TO_0).on(latch).countDown();
                 assertEquals(0, latch.getCount());
             }
         };

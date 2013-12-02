@@ -2,6 +2,10 @@ package org.housered.concomitant.monitoring;
 
 import org.housered.concomitant.TestThread;
 
+/**
+ * Wraps a test thread with a runnable that captures issues (exceptions + misuse) for
+ * test reporting, and provides a mechanism to get the current TestThread.
+ */
 public class TestThreadRunner implements Runnable {
 
     private static ThreadLocal<TestThread> currentThread = new ThreadLocal<TestThread>();

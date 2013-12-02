@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 
 public class ThreadManagementTests {
     
-    @Ignore
+    @Ignore // This is run and examined by the below tests, not standalone.
     @RunWith(ConcomitantRunner.class)
     public static class TestClassWithImplicitlyStartedThread {
         
@@ -37,7 +37,7 @@ public class ThreadManagementTests {
         assertTrue(TestClassWithImplicitlyStartedThread.threadWasRun);
     }
     
-    @Ignore
+    @Ignore // This is run and examined by the below tests, not standalone.
     @RunWith(ConcomitantRunner.class)
     public static class TestClassWithImplicitStartedThreadThatNeedsTime {
         
