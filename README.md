@@ -19,3 +19,7 @@ Inspirations
 This is modelled around the design and principles of previous frameworks like [MultithreadedTC](http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html) and [IMUnit](http://crest.cs.ucl.ac.uk/cow/17/slides/COW17_Marinov.pdf), also pulling in elements from other investigations in this field such as [ConcJunit](http://www.cs.rice.edu/~mgricken/research/concutest/concjunit/) and [ThreadControl](http://code.google.com/p/threadcontrol/).
 
 Concomitant is an attempt to pull these together into a practical framework for testing concurrent mechanisms, primarily for use with Mockito and JUnit 4, with a fluent and intuitive API in the same style as Mockito's.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/pimterry/concomitant/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
